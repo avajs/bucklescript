@@ -1,0 +1,25 @@
+{
+  "name": "@godu/bs-ava",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
+    "pretest": "npm run build",
+    "test": "ava"
+  },
+  "keywords": [
+    "bucklescript",
+    "reason",
+    "ava",
+    "test"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "bs-platform": "^3.1.5"
+  },
+  "dependencies": {
+    "ava": "^0.25.0"
+  }
+}

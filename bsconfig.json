@@ -1,0 +1,19 @@
+{
+  "name": "@godu/bs-ava",
+  "version": "0.1.0",
+  "sources": [
+    {
+      "dir": "src"
+    },
+    {
+      "dir": "test",
+      "type": "dev"
+    }
+  ],
+  "suffix": ".bs.js",
+  "bs-dependencies": [],
+  "warnings": {
+    "error": "+101"
+  },
+  "refmt": 3
+}
