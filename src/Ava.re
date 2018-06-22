@@ -3,6 +3,7 @@ type testFuncs = {
   fail: string => unit,
   truthy: (string, bool) => unit,
   falsy: (string, bool) => unit,
+  deepEqual: 'a.(string, 'a, 'a) => unit
 };
 
 [@bs.module "ava"]
@@ -39,12 +40,14 @@ external _testAfterEach : (testFuncs => _) => unit = "afterEach";
 [@bs.send] external _fail : (testFuncs, string) => unit = "fail";
 [@bs.send] external _truthy : (testFuncs, bool, string) => unit = "truthy";
 [@bs.send] external _falsy : (testFuncs, bool, string) => unit = "falsy";
+[@bs.send] external _deepEqual : (testFuncs, 'a, 'a, string) => unit = "deepEqual";
 
 let _assertFactory = t => {
   pass: s => _pass(t, s),
   fail: s => _fail(t, s),
   truthy: (s, b) => _truthy(t, b, s),
   falsy: (s, b) => _falsy(t, b, s),
+  deepEqual: (s, b, a) => _deepEqual(t, a, b, s),
 };
 
 let test = (name, f) => _test(name, t => f(_assertFactory(t)));

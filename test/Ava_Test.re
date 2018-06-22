@@ -31,3 +31,10 @@ test("Test#truthy", t =>
 test("Test#falsy", t =>
   t.falsy("falsy", false)
 );
+
+test("Test#deepEqual", t =>
+  t.deepEqual("deepEqual", ["foo"], ["foo"])
+);
+testFailing("Test#deepEqual", t =>
+  t.deepEqual("deepEqual", ["foo"], ["bar"])
+);
