@@ -8,6 +8,10 @@
     "pretest": "npm run build",
     "test": "ava"
   },
+  "files": [
+    "src/Ava.re",
+    "bsconfig.json"
+  ],
   "keywords": [
     "bucklescript",
     "reason",
