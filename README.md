@@ -63,3 +63,28 @@ test("Test#deepEqual", t =>
   t.deepEqual("deepEqual", ["foo"], ["foo"])
 );
 ```
+
+# Usage with bs-register
+
+`bs-register` includes a require hook for `.re` files. This lets Ava run Reason files as tests.
+
+- Install `@godu/bs-register`
+```sh
+npm i -D @godu/bs-register
+```
+
+- Edit your `package.json`
+```json
+{
+  ...
+  "ava": {
+    "extensions": [
+      "re"
+    ],
+    "compileEnhancements": false,
+    "require": [
+      "@godu/bs-register"
+    ]
+  }
+}
+```
