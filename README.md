@@ -1,18 +1,65 @@
-# Basic Reason Template
+# bs-ava
 
-Hello! This project allows you to quickly get started with Reason and BuckleScript. If you wanted a more sophisticated version, try the `react` template (`bsb -theme react -init .`).
+**Experimental** [BuckleScript](https://github.com/bucklescript/bucklescript) bindings for [Ava](https://github.com/avajs/ava)
 
-# Build
-```
-npm run build
-```
+# Installation
 
-# Build + Watch
-
-```
-npm run start
+```sh
+npm install --save-dev @godu/bs-ava
 ```
 
+Then add `@godu/bs-ava` to `bs-dev-dependencies` in your `bsconfig.json`:
+```js
+{
+  ...
+  "bs-dev-dependencies": ["@godu/bs-ava"]
+}
+```
 
-# Editor
-If you use `vscode`, Press `Windows + Shift + B` it will build automatically
+# Getting started
+
+```ml
+open Ava;
+
+testBefore(_ => ());
+
+testAfter(_ => ());
+
+testBeforeEach(_ => ());
+
+testAfterEach(_ => ());
+
+test("Test#pass", t =>
+  t.pass("pass")
+);
+
+testSerial("TestSerial#pass", t =>
+  t.pass("serial")
+);
+
+testOnly("TestOnly#pass", t =>
+  t.pass("only")
+);
+
+testSkip("TestSkip#pass", t =>
+  t.pass("skip")
+);
+
+testTodo("TestTodo#pass");
+
+testFailing("TestFailing#fail", t =>
+  t.fail("fail")
+);
+
+test("Test#truthy", t =>
+  t.truthy("truthy", true)
+);
+
+test("Test#falsy", t =>
+  t.falsy("falsy", false)
+);
+
+test("Test#deepEqual", t =>
+  t.deepEqual("deepEqual", ["foo"], ["foo"])
+);
+```
