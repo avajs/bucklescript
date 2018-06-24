@@ -1,5 +1,3 @@
 open Ava;
 
-test("pass", t =>
-  t.pass()
-);
+test.run("pass", t => t.pass());

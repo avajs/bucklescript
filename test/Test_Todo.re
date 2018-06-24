@@ -1,3 +1,3 @@
 open Ava;
 
-testTodo("todo");
+test.todo("todo");

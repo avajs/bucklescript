@@ -1,3 +1,3 @@
 open Ava;
 
-testFailing("failing", t => t.fail("should failed"));
+test.failing().run("failing", t => t.fail());

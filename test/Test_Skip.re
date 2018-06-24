@@ -1,3 +1,3 @@
 open Ava;
 
-testSkip("skip", t => t.pass());
+test.skip("skip", t => t.pass());

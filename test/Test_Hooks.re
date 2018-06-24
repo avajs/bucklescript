@@ -1,9 +1,9 @@
 open Ava;
 
-testBefore(t => t.pass());
-testAfter(t => t.pass());
+/* test.before().run(t => t.pass());
+   test.after().run(t => t.pass()); */
 
-test("hooks", t => t.pass());
+test.run("hooks", t => t.pass());
 
-testBeforeEach(t => t.pass());
-testAfterEach(t => t.pass());
+/* test.beforeEach().run(t => t.pass());
+   test.afterEach().run(t => t.pass()); */

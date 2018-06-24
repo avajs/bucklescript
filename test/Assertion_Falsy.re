@@ -1,7 +1,5 @@
 open Ava;
 
-test("falsy", t =>
-  t.falsy("falsy", false)
-);
+test.run("falsy", t => t.falsy(false));
 
-testFailing("falsy#fail", t => t.falsy("falsy", true));
+test.failing().run("falsy#fail", t => t.falsy(true));

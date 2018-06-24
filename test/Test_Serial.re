@@ -1,3 +1,3 @@
 open Ava;
 
-testSerial("serial", t => t.pass());
+test.serial().run("serial", t => t.pass());

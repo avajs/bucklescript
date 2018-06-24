@@ -1,73 +1,186 @@
-type testFuncs = {
+type passAssertion = unit => unit;
+type failAssertion = unit => unit;
+type truthyAssertion = bool => unit;
+type falsyAssertion = bool => unit;
+/* type deepEqualAssertion = 'a.('a, 'a) => unit; */
+
+type assertions = {
+  pass: passAssertion,
+  fail: failAssertion,
+  truthy: truthyAssertion,
+  falsy: falsyAssertion,
+  deepEqual: 'a.('a, 'a) => unit,
+};
+
+type executionContext = assertions;
+
+type implementationResult = unit;
+
+type implementation = executionContext => implementationResult;
+
+type todoDeclaration = (string) => unit;
+type onlyInterface = (string, implementation) => unit;
+type skipInterface = (string, implementation) => unit;
+type failingInterface = {
+  run: (string, implementation) => unit,
+  skip: skipInterface,
+  only: onlyInterface,
+}
+type serialInterface = {
+  run: (string, implementation) => unit,
+  failing: unit => failingInterface,
+  only: onlyInterface,
+  skip: skipInterface,
+  todo: todoDeclaration,
+};
+type testInterface = {
+  run: (string, implementation) => unit,
+  todo: todoDeclaration,
+  failing: unit => failingInterface,
+  serial: unit => serialInterface,
+  skip: skipInterface,
+  only: onlyInterface,
+};
+
+type implementationResultJS = unit;
+
+type executionContextJS = {
   pass: unit => unit,
-  fail: string => unit,
-  truthy: (string, bool) => unit,
-  falsy: (string, bool) => unit,
-  deepEqual: 'a .(string, 'a, 'a) => unit,
+  fail: unit => unit,
+  truthy: (bool) => unit,
+  falsy: (bool) => unit,
+  deepEqual: 'a.('a, 'a) => unit,
+};
+
+type implementationJS = executionContextJS => implementationResultJS;
+
+type failingInterfaceJS = {
+  call: (failingInterfaceJS, string, testInterface) => unit,
+  skip: failingInterfaceJS,
+  only: (failingInterfaceJS, string, testInterface) => unit
+};
+type serialInterfaceJS = {
+  call: (serialInterfaceJS, string, testInterface) => unit,
+  only: (serialInterfaceJS, string, testInterface) => unit,
+  skip: (serialInterfaceJS, string, testInterface) => unit,
+  todo: (serialInterfaceJS, string) => unit,
+};
+type testInterfaceJS = {
+  call: (testInterfaceJS, string, testInterface) => unit,
+  todo: (testInterfaceJS, string) => unit,
+  failing: testInterfaceJS,
+  serial: testInterfaceJS,
+  skip: (testInterfaceJS, string, testInterface) => unit,
+  only: (testInterfaceJS, string, testInterface) => unit,
+};
+
+[@bs.send] external _passAssertion : (executionContextJS) => unit = "pass";
+[@bs.send] external _failAssertion : (executionContextJS) => unit = "fail";
+[@bs.send] external _truthyAssertion : (executionContextJS, bool) => unit = "truthy";
+[@bs.send] external _falsyAssertion : (executionContextJS, bool) => unit = "falsy";
+[@bs.send] external _deepEqualTest : (executionContextJS, 'a, 'a) => unit = "deepEqual";
+
+let executionContextFactory = (t: executionContextJS): executionContext => {
+  pass: () => {
+    _passAssertion(t);
+  },
+  fail: () => {
+    _failAssertion(t);
+  },
+  truthy: (actual) => {
+    _truthyAssertion(t, actual);
+  },
+  falsy: (actual) => {
+    _falsyAssertion(t, actual);
+  },
+  deepEqual: (expected, actual) => {
+    _deepEqualTest(t, actual, expected);
+  },
+};
+
+[@bs.send] external _callFailingTest : (failingInterfaceJS, failingInterfaceJS, string, implementationJS) => unit = "call";
+[@bs.send] external _callSkipFailingTest : (failingInterfaceJS, string, implementationJS) => unit = "skip";
+[@bs.send] external _callOnlyFailingTest : (failingInterfaceJS, string, implementationJS) => unit = "only";
+let failingInterfaceFactory = (test: failingInterfaceJS) : failingInterface => {
+  run: (message, implementation) => {
+    _callFailingTest(test, test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+  skip: (message, implementation) => {
+    _callSkipFailingTest(test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+  only: (message, implementation) => {
+    _callOnlyFailingTest(test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+};
+
+[@bs.send] external _callSerialTest : (serialInterfaceJS, serialInterfaceJS, string, implementationJS) => unit = "call";
+[@bs.send] external _callSkipSerialTest : (serialInterfaceJS, string, implementationJS) => unit = "skip";
+[@bs.send] external _callOnlySerialTest : (serialInterfaceJS, string, implementationJS) => unit = "only";
+[@bs.send] external _callTodoSerialTest : (serialInterfaceJS, string) => unit = "todo";
+[@bs.get] external _getFailingSerialTest : serialInterfaceJS => failingInterfaceJS = "failing";
+let serialInterfaceFactory = (test: serialInterfaceJS) : serialInterface => {
+  run: (message, implementation) => {
+    _callSerialTest(test, test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+  skip: (message, implementation) => {
+    _callSkipSerialTest(test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+  only: (message, implementation) => {
+    _callOnlySerialTest(test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+  failing: () => {
+    test |> _getFailingSerialTest |> failingInterfaceFactory;
+  },
+  todo: (message) => {
+    _callTodoSerialTest(test, message);
+  },
+};
+
+[@bs.send] external _callTest : (testInterfaceJS, testInterfaceJS, string, implementationJS) => unit = "call";
+[@bs.send] external _callTodoTest : (testInterfaceJS, string) => unit = "todo";
+[@bs.get] external _getFailingTest : testInterfaceJS => failingInterfaceJS = "failing";
+[@bs.get] external _getSerialTest : testInterfaceJS => serialInterfaceJS = "serial";
+[@bs.send] external _callSkipTest : (testInterfaceJS, string, implementationJS) => unit = "skip";
+[@bs.send] external _callOnlyTest : (testInterfaceJS, string, implementationJS) => unit = "only";
+let testInterfaceFactory = (test: testInterfaceJS): testInterface =>  {
+  run: (message, implementation) => {
+    _callTest(test, test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+  todo: (message) => {
+    _callTodoTest(test, message);
+  },
+  failing: () => {
+    test |> _getFailingTest |> failingInterfaceFactory;
+  },
+  serial: () => {
+    test |> _getSerialTest |> serialInterfaceFactory;
+  },
+  skip: (message, implementation) => {
+    _callSkipTest(test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
+  only: (message, implementation) => {
+    _callOnlyTest(test, message, tJS => {
+      implementation(executionContextFactory(tJS));
+    });
+  },
 };
 
 [@bs.module "ava"]
-external _test : (string, testFuncs => unit) => unit = "test";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testSerial : (string, testFuncs => unit) => unit = "serial";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testOnly : (string, testFuncs => unit) => unit = "only";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testSkip : (string, testFuncs => unit) => unit = "skip";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testTodo : string => unit = "todo";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testFailing : (string, testFuncs => unit) => unit = "failing";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testBefore : (testFuncs => _) => unit = "before";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testAfter : (testFuncs => _) => unit = "after";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testBeforeEach : (testFuncs => _) => unit = "beforeEach";
-
-[@bs.module "ava"] [@bs.scope "test"]
-external _testAfterEach : (testFuncs => _) => unit = "afterEach";
-
-[@bs.send] external _pass : testFuncs => unit = "pass";
-[@bs.send] external _fail : (testFuncs, string) => unit = "fail";
-[@bs.send] external _truthy : (testFuncs, bool, string) => unit = "truthy";
-[@bs.send] external _falsy : (testFuncs, bool, string) => unit = "falsy";
-[@bs.send]
-external _deepEqual : (testFuncs, 'a, 'a, string) => unit = "deepEqual";
-
-let _assertFactory = t => {
-  pass: () => _pass(t),
-  fail: s => _fail(t, s),
-  truthy: (s, b) => _truthy(t, b, s),
-  falsy: (s, b) => _falsy(t, b, s),
-  deepEqual: (s, b, a) => _deepEqual(t, a, b, s),
-};
-
-let test = (name, f) => _test(name, t => f(_assertFactory(t)));
-
-let testSerial = (name, f) => _testSerial(name, t => f(_assertFactory(t)));
-
-let testOnly = (name, f) => _testOnly(name, t => f(_assertFactory(t)));
-
-let testSkip = (name, f) => _testSkip(name, t => f(_assertFactory(t)));
-
-let testFailing = (name, f) =>
-  _testFailing(name, t => f(_assertFactory(t)));
-
-let testBefore = f => _testBefore(t => f(_assertFactory(t)));
-
-let testAfter = f => _testAfter(t => f(_assertFactory(t)));
-
-let testBeforeEach = f => _testBeforeEach(t => f(_assertFactory(t)));
-
-let testAfterEach = f => _testAfterEach(t => f(_assertFactory(t)));
-
-let testTodo = name => _testTodo(name);
+external testJS : testInterfaceJS = "test";
+let test = testInterfaceFactory(testJS);

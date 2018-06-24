@@ -1,9 +1,5 @@
 open Ava;
 
-test("truthy", t =>
-  t.truthy("truthy", true)
-);
+test.run("truthy", t => t.truthy(true));
 
-testFailing("truthy#fail", t =>
-  t.truthy("truthy", false)
-);
+test.failing().run("truthy#fail", t => t.truthy(false));

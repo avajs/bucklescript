@@ -5,35 +5,23 @@ type recordExample = {
   string,
 };
 
-test("deepEqual", t => {
-  t.deepEqual("deepEqual#bool", true, true);
-  t.deepEqual("deepEqual#int", 3, 3);
-  t.deepEqual("deepEqual#string", "foo", "foo");
-  t.deepEqual("deepEqual#list", ["foo"], ["foo"]);
-  t.deepEqual("deepEqual#tuple", (3, "foo"), (3, "foo"));
-  t.deepEqual(
-    "deepEqual#record",
-    {int: 3, string: "foo"},
-    {int: 3, string: "foo"},
-  );
+test.run("deepEqual", t => {
+  t.deepEqual(true, true);
+  t.deepEqual(3, 3);
+  t.deepEqual("foo", "foo");
+  t.deepEqual(["foo"], ["foo"]);
+  t.deepEqual((3, "foo"), (3, "foo"));
+  t.deepEqual({int: 3, string: "foo"}, {int: 3, string: "foo"});
 });
-testFailing("deepEqual#fail#bool", t =>
-  t.deepEqual("deepEqual#bool", true, false)
+test.failing().run("deepEqual#fail#bool", t => t.deepEqual(true, false));
+test.failing().run("deepEqual#fail#int", t => t.deepEqual(3, 4));
+test.failing().run("deepEqual#fail#string", t => t.deepEqual("foo", "bar"));
+test.failing().run("deepEqual#fail#list", t =>
+  t.deepEqual(["foo"], ["bar"])
 );
-testFailing("deepEqual#fail#int", t => t.deepEqual("deepEqual#int", 3, 4));
-testFailing("deepEqual#fail#string", t =>
-  t.deepEqual("deepEqual#string", "foo", "bar")
+test.failing().run("deepEqual#fail#tuple", t =>
+  t.deepEqual((3, "foo"), (4, "bar"))
 );
-testFailing("deepEqual#fail#list", t =>
-  t.deepEqual("deepEqual#list", ["foo"], ["bar"])
-);
-testFailing("deepEqual#fail#tuple", t =>
-  t.deepEqual("deepEqual#tuple", (3, "foo"), (4, "bar"))
-);
-testFailing("deepEqual#fail#record", t =>
-  t.deepEqual(
-    "deepEqual#record",
-    {int: 3, string: "foo"},
-    {int: 4, string: "bar"},
-  )
+test.failing().run("deepEqual#fail#record", t =>
+  t.deepEqual({int: 3, string: "foo"}, {int: 4, string: "bar"})
 );

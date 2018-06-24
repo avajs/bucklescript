@@ -1,3 +1,3 @@
 open Ava;
 
-testOnly("only", t => t.pass());
+test.only("only", t => t.pass());
