@@ -1,6 +1,17 @@
-open Ava.Sync;
+open Ava;
 
-test_only("Sync.test_only", t => t.pass());
-test_failing_only("Sync.test_failing_only", t => t.fail());
-Serial.test_only("Sync.Serial.test_only", t => t.pass());
-/* Serial.test_failing_only("Sync.Serial.test_failing_only", t => t.fail()); */
+Sync.test_only("Sync.test_only", t => t.pass());
+Sync.test_failing_only("Sync.test_failing_only", t => t.fail());
+Sync.Serial.test_only("Sync.Serial.test_only", t => t.pass());
+/* Sync.Serial.test_failing_only("Sync.Serial.test_failing_only", t => t.fail()); */
+
+Async.test_only("Async.test_only", t => t.cb());
+Async.test_failing_only("Async.test_failing_only", t => {
+  let error: Js.Exn.t = [%raw {| new Error("error out") |}];
+  t.cb(~error, ());
+});
+/* Async.Serial.test_only("Async.Serial.test_only", t => t.cb()); */
+/* Async.Serial.test_failing_only("Async.Serial.test_failing_only", t => {
+     let error : Js.Exn.t = [%raw {| new Error("error out") |}];
+     t.cb(~error, ());
+   }); */

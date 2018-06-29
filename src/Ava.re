@@ -326,31 +326,33 @@ module Async = {
       (message, implementation) =>
         _test(message, implementation |> makeCbImplementation);
 
-    [@bs.module "ava"] [@bs.scope ("test", "serial", "only")]
-    external _test_only : (string, cbExecutionContextJS => unit) => unit =
-      "cb";
-    let test_only: cbOnlyInterface =
-      (message, implementation) =>
-        _test_only(message, implementation |> makeCbImplementation);
+    /* [@bs.module "ava"] [@bs.scope ("test", "serial", "only")]
+       external _test_only : (string, cbExecutionContextJS => unit) => unit =
+         "cb";
+       let test_only: cbOnlyInterface =
+         (message, implementation) =>
+           _test_only(message, implementation |> makeCbImplementation); */
 
     /* [@bs.module "ava"] [@bs.scope ("test", "serial", "failing", "only")]
-       external _test_failing_only : (string, cbExecutionContextJS => unit) => unit =
+       external _test_failing_only :
+         (string, cbExecutionContextJS => unit) => unit =
          "cb";
        let test_failing_only: cbOnlyInterface =
          (message, implementation) =>
            _test_failing_only(message, implementation |> makeCbImplementation); */
 
-    [@bs.module "ava"] [@bs.scope ("test", "serial", "skip")]
-    external _test_skip : (string, cbExecutionContextJS => unit) => unit =
-      "cb";
-    let test_skip: cbSkipInterface =
-      (message, implementation) =>
-        _test_skip(message, implementation |> makeCbImplementation);
+    /* [@bs.module "ava"] [@bs.scope ("test", "serial", "skip")]
+       external _test_skip : (string, cbExecutionContextJS => unit) => unit =
+         "cb";
+       let test_skip: cbSkipInterface =
+         (message, implementation) =>
+           _test_skip(message, implementation |> makeCbImplementation); */
 
     /* [@bs.module "ava"] [@bs.scope ("test", "serial", "failing", "skip")]
-       external _test_failing_skip : (string, cbExecutionContextJS => unit) => unit =
+       external _test_failing_skip :
+         (string, cbExecutionContextJS => unit) => unit =
          "cb";
-       let test_failing_skip: skipInterface =
+       let test_failing_skip: cbSkipInterface =
          (message, implementation) =>
            _test_failing_skip(message, implementation |> makeCbImplementation); */
 
