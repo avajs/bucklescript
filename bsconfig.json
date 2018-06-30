@@ -15,6 +15,7 @@
   "warnings": {
     "error": "+101"
   },
+  "namespace": true,
   "bsc-flags": [
     "-bs-no-version-header",
     "-bs-super-errors"
