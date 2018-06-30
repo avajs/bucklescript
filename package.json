@@ -7,6 +7,14 @@
     "clean": "bsb -clean-world",
     "test": "ava"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/godu/bs-ava.git"
+  },
+  "bugs": {
+    "url": "https://github.com/godu/bs-ava/issues"
+  },
+  "homepage": "https://github.com/godu/bs-ava#readme",
   "files": [
     "src/Ava.re",
     "bsconfig.json"
@@ -17,7 +25,7 @@
     "ava",
     "test"
   ],
-  "author": "Arthur Weber <arthur.weber@viacesi.fr>",
+  "author": "godu",
   "license": "MIT",
   "devDependencies": {
     "@godu/bs-register": "^0.1.0",
