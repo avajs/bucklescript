@@ -4,7 +4,7 @@ test("Async.test", t =>
   t.cb()
 );
 test_failing("Async.test_failing", t => {
-  let error: Js.Exn.t = [%raw {| new Error("error out") |}];
+  let error: Js.Exn.t = [%raw {| new Error("Oh no") |}];
   t.cb(~error, ());
 });
 after(t => t.cb());

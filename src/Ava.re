@@ -2,107 +2,78 @@ type passAssertion = unit => unit;
 type failAssertion = unit => unit;
 type truthyAssertion = bool => unit;
 type falsyAssertion = bool => unit;
-/* type deepEqualAssertion = 'a.('a, 'a) => unit; */
-type notThrowsAssertion('a) = Js.Promise.t('a) => Js.Promise.t(unit);
+type isAssertion('a) = ('a, 'a) => unit;
+type notAssertion('a) = ('a, 'a) => unit;
+type deepEqualAssertion('a) = ('a, 'a) => unit;
+type notDeepEqualAssertion('a) = ('a, 'a) => unit;
+type throwsSyncAssertion = (unit => unit) => unit;
+type notThrowsSyncAssertion = (unit => unit) => unit;
+type throwsPromiseAssertion('a) = Js.Promise.t('a) => Js.Promise.t(unit);
+type notThrowsPromiseAssertion('a) = Js.Promise.t('a) => Js.Promise.t(unit);
+type regexAssertion = (Js.Re.t, string) => unit;
+type notRegexAssertion = (Js.Re.t, string) => unit;
 
 type assertions = {
   pass: passAssertion,
   fail: failAssertion,
-  /* truthy: truthyAssertion,
-     falsy: falsyAssertion,
-     deepEqual: 'a .('a, 'a) => unit, */
+  truthy: truthyAssertion,
+  falsy: falsyAssertion,
+  is: 'a.isAssertion('a),
+  not: 'a.notAssertion('a),
+  deepEqual: 'a.deepEqualAssertion('a),
+  notDeepEqual: 'a.notDeepEqualAssertion('a),
+  throws: throwsSyncAssertion,
+  notThrows: notThrowsSyncAssertion,
+  regex: regexAssertion,
+  notRegex: notRegexAssertion,
 };
+type executionContext = assertions;
+type executionContextJS;
+type implementationResultJS = unit;
+type implementationJS = executionContextJS => implementationResultJS;
+type implementationResult = unit;
+type implementation = executionContext => implementationResult;
+
 type cbAssertions = {
   pass: passAssertion,
   fail: failAssertion,
-  /* truthy: truthyAssertion,
-     falsy: falsyAssertion,
-     deepEqual: 'a .('a, 'a) => unit, */
+  truthy: truthyAssertion,
+  falsy: falsyAssertion,
+  is: 'a.isAssertion('a),
+  not: 'a.notAssertion('a),
+  deepEqual: 'a.deepEqualAssertion('a),
+  notDeepEqual: 'a.notDeepEqualAssertion('a),
+  regex: regexAssertion,
+  notRegex: notRegexAssertion,
   cb: (~error: Js.Exn.t=?, unit) => unit,
 };
+type cbExecutionContext = cbAssertions;
+type cbExecutionContextJS;
+type cbImplementationJS = cbExecutionContextJS => implementationResultJS;
+type cbImplementation = cbExecutionContext => implementationResult;
+
 type promiseAssertions = {
   pass: passAssertion,
   fail: failAssertion,
-  /* truthy: truthyAssertion,
-     falsy: falsyAssertion,
-     deepEqual: 'a .('a, 'a) => unit, */
-  notThrows: 'a .notThrowsAssertion('a),
+  truthy: truthyAssertion,
+  falsy: falsyAssertion,
+  is: 'a.isAssertion('a),
+  not: 'a.notAssertion('a),
+  deepEqual: 'a.deepEqualAssertion('a),
+  notDeepEqual: 'a.notDeepEqualAssertion('a),
+  throws: 'a.throwsPromiseAssertion('a),
+  notThrows: 'a.notThrowsPromiseAssertion('a),
+  regex: regexAssertion,
+  notRegex: notRegexAssertion,
 };
-
-type executionContext = assertions;
-type cbExecutionContext = cbAssertions;
 type promiseExecutionContext = promiseAssertions;
-
-type executionContextJS;
-[@bs.send] external _pass : executionContextJS => unit = "pass";
-[@bs.send] external _fail : executionContextJS => unit = "fail";
-[@bs.send] external _end : executionContextJS => unit = "end";
-let makeExecutionContext =
-    (executionContextJS: executionContextJS)
-    : executionContext => {
-  pass: () => _pass(executionContextJS),
-  fail: () => _fail(executionContextJS),
-};
-type cbExecutionContextJS;
-[@bs.send] external _cb_pass : cbExecutionContextJS => unit = "pass";
-[@bs.send] external _cb_fail : cbExecutionContextJS => unit = "fail";
-[@bs.send]
-external _cb_end : (cbExecutionContextJS, Js.Nullable.t(Js.Exn.t)) => unit =
-  "end";
-let makeCbExecutionContext =
-    (cbExecutionContextJS: cbExecutionContextJS)
-    : cbExecutionContext => {
-  pass: () => _cb_pass(cbExecutionContextJS),
-  fail: () => _cb_fail(cbExecutionContextJS),
-  cb: (~error: option(Js.Exn.t)=?, _) =>
-    _cb_end(cbExecutionContextJS, Js.Nullable.fromOption(error)),
-};
 type promiseExecutionContextJS;
-[@bs.send] external _promise_pass : promiseExecutionContextJS => unit = "pass";
-[@bs.send] external _promise_fail : promiseExecutionContextJS => unit = "fail";
-[@bs.send]
-external _promise_not_throws :
-  (promiseExecutionContextJS, Js.Promise.t('a)) => Js.Promise.t(unit) =
-  "notThrows";
-[@bs.send]
-external _promise_end :
-  (promiseExecutionContextJS, Js.Nullable.t(Js.Exn.t)) => unit =
-  "end";
-let makePromiseExecutionContext =
-    (promiseExecutionContextJS: promiseExecutionContextJS)
-    : promiseExecutionContext => {
-  pass: () => _promise_pass(promiseExecutionContextJS),
-  fail: () => _promise_fail(promiseExecutionContextJS),
-  notThrows: nonThrower =>
-    _promise_not_throws(promiseExecutionContextJS, nonThrower),
-};
-
-type implementationResult = unit;
 type promiseImplementationResult('a) = Js.Promise.t('a);
-type implementationResultJS = unit;
 type promiseImplementationResultJS('a) = Js.Promise.t('a);
-let makeImplementationResultJS: implementationResultJS => implementationResult =
-  result => result;
-let makePromiseImplementationResultJS:
-  promiseImplementationResultJS('a) => promiseImplementationResult('a) =
-  result => result;
 
-type implementation = executionContext => implementationResult;
-type cbImplementation = cbExecutionContext => implementationResult;
 type promiseImplementation('a) =
   promiseExecutionContext => promiseImplementationResult('a);
 
-type implementationJS = executionContextJS => implementationResultJS;
-type cbImplementationJS = cbExecutionContextJS => implementationResultJS;
-let makeImplementation = (implementation, t) =>
-  t |> makeExecutionContext |> implementation |> makeImplementationResultJS;
-let makeCbImplementation = (cbImplementation, t) =>
-  t |> makeCbExecutionContext |> cbImplementation |> makeImplementationResultJS;
-let makePromiseImplementation = (promiseImplementation, t) =>
-  t
-  |> makePromiseExecutionContext
-  |> promiseImplementation
-  |> makePromiseImplementationResultJS;
 
 type testInterface = (string, implementation) => unit;
 type todoDeclaration = string => unit;
@@ -131,6 +102,42 @@ type onlyPromiseInterface('a) = (string, promiseImplementation('a)) => unit;
 type skipPromiseInterface('a) = (string, promiseImplementation('a)) => unit;
 
 module Sync = {
+  [@bs.send] external _pass : executionContextJS => unit = "pass";
+  [@bs.send] external _fail : executionContextJS => unit = "fail";
+  [@bs.send] external _truthy : (executionContextJS, bool) => unit = "truthy";
+  [@bs.send] external _falsy : (executionContextJS, bool) => unit = "falsy";
+  [@bs.send] external _is : (executionContextJS, 'a, 'a) => unit = "is";
+  [@bs.send] external _not : (executionContextJS, 'a, 'a) => unit = "not";
+  [@bs.send] external _deepEqual : (executionContextJS, 'a, 'a) => unit = "deepEqual";
+  [@bs.send] external _notDeepEqual : (executionContextJS, 'a, 'a) => unit = "notDeepEqual";
+  [@bs.send] external _throws : (executionContextJS, unit => unit) => unit = "throws";
+  [@bs.send] external _notThrows : (executionContextJS, unit => unit) => unit = "notThrows";
+  [@bs.send] external _regex : (executionContextJS, string, Js.Re.t) => unit = "regex";
+  [@bs.send] external _notRegex : (executionContextJS, string, Js.Re.t) => unit = "notRegex";
+  [@bs.send] external _end : executionContextJS => unit = "end";
+
+  let makeExecutionContext =
+      (executionContextJS: executionContextJS)
+      : executionContext => {
+    pass: () => _pass(executionContextJS),
+    fail: () => _fail(executionContextJS),
+    truthy: actual => _truthy(executionContextJS, actual),
+    falsy: actual => _falsy(executionContextJS, actual),
+    is: (expected, actual) => _is(executionContextJS, actual, expected),
+    not: (expected, actual) => _not(executionContextJS, actual, expected),
+    deepEqual: (expected, actual) => _deepEqual(executionContextJS, actual, expected),
+    notDeepEqual: (expected, actual) => _notDeepEqual(executionContextJS, actual, expected),
+    throws: (task) => _throws(executionContextJS, task),
+    notThrows: (task) => _notThrows(executionContextJS, task),
+    regex: (regex, content) => _regex(executionContextJS, content, regex),
+    notRegex: (regex, content) => _notRegex(executionContextJS, content, regex),
+  };
+  let makeImplementationResultJS: implementationResultJS => implementationResult =
+      result => result;
+  let makeImplementation = (implementation, t) =>
+    t |> makeExecutionContext |> implementation |> makeImplementationResultJS;
+
+
   [@bs.module "ava"]
   external _test : (string, executionContextJS => unit) => unit = "test";
   let test: testInterface =
@@ -305,6 +312,41 @@ module Sync = {
 };
 
 module Async = {
+  [@bs.send] external _cb_pass : cbExecutionContextJS => unit = "pass";
+  [@bs.send] external _cb_fail : cbExecutionContextJS => unit = "fail";
+  [@bs.send] external _truthy : (cbExecutionContextJS, bool) => unit = "truthy";
+  [@bs.send] external _falsy : (cbExecutionContextJS, bool) => unit = "falsy";
+  [@bs.send] external _is : (cbExecutionContextJS, 'a, 'a) => unit = "is";
+  [@bs.send] external _not : (cbExecutionContextJS, 'a, 'a) => unit = "not";
+  [@bs.send] external _deepEqual : (cbExecutionContextJS, 'a, 'a) => unit = "deepEqual";
+  [@bs.send] external _notDeepEqual : (cbExecutionContextJS, 'a, 'a) => unit = "notDeepEqual";
+  [@bs.send] external _regex : (cbExecutionContextJS, string, Js.Re.t) => unit = "regex";
+  [@bs.send] external _notRegex : (cbExecutionContextJS, string, Js.Re.t) => unit = "notRegex";
+  [@bs.send]
+  external _cb_end : (cbExecutionContextJS, Js.Nullable.t(Js.Exn.t)) => unit =
+    "end";
+
+  let makeCbExecutionContext =
+      (cbExecutionContextJS: cbExecutionContextJS)
+      : cbExecutionContext => {
+    pass: () => _cb_pass(cbExecutionContextJS),
+    fail: () => _cb_fail(cbExecutionContextJS),
+    truthy: actual => _truthy(cbExecutionContextJS, actual),
+    falsy: actual => _falsy(cbExecutionContextJS, actual),
+    is: (expected, actual) => _is(cbExecutionContextJS, actual, expected),
+    not: (expected, actual) => _not(cbExecutionContextJS, actual, expected),
+    deepEqual: (expected, actual) => _deepEqual(cbExecutionContextJS, actual, expected),
+    notDeepEqual: (expected, actual) => _notDeepEqual(cbExecutionContextJS, actual, expected),
+    regex: (regex, content) => _regex(cbExecutionContextJS, content, regex),
+    notRegex: (regex, content) => _notRegex(cbExecutionContextJS, content, regex),
+    cb: (~error: option(Js.Exn.t)=?, _) =>
+      _cb_end(cbExecutionContextJS, Js.Nullable.fromOption(error)),
+  };
+  let makeImplementationResultJS: implementationResultJS => implementationResult =
+      result => result;
+  let makeCbImplementation = (cbImplementation, t) =>
+    t |> makeCbExecutionContext |> cbImplementation |> makeImplementationResultJS;
+
   [@bs.module "ava"] [@bs.scope "test"]
   external _test : (string, cbExecutionContextJS => unit) => unit = "cb";
   let test: cbInterface =
@@ -481,6 +523,56 @@ module Async = {
 };
 
 module Promise = {
+  [@bs.send] external _pass : promiseExecutionContextJS => unit = "pass";
+  [@bs.send] external _fail : promiseExecutionContextJS => unit = "fail";
+  [@bs.send] external _truthy : (promiseExecutionContextJS, bool) => unit = "truthy";
+  [@bs.send] external _falsy : (promiseExecutionContextJS, bool) => unit = "falsy";
+  [@bs.send] external _is : (promiseExecutionContextJS, 'a, 'a) => unit = "is";
+  [@bs.send] external _not : (promiseExecutionContextJS, 'a, 'a) => unit = "not";
+  [@bs.send] external _deepEqual : (promiseExecutionContextJS, 'a, 'a) => unit = "deepEqual";
+  [@bs.send] external _notDeepEqual : (promiseExecutionContextJS, 'a, 'a) => unit = "notDeepEqual";
+  [@bs.send]
+  external _throws :
+    (promiseExecutionContextJS, Js.Promise.t('a)) => Js.Promise.t(unit) =
+    "throws";
+  [@bs.send]
+  external _not_throws :
+    (promiseExecutionContextJS, Js.Promise.t('a)) => Js.Promise.t(unit) =
+    "notThrows";
+  [@bs.send] external _regex : (promiseExecutionContextJS, string, Js.Re.t) => unit = "regex";
+  [@bs.send] external _notRegex : (promiseExecutionContextJS, string, Js.Re.t) => unit = "notRegex";
+  [@bs.send]
+  external _end :
+    (promiseExecutionContextJS, Js.Nullable.t(Js.Exn.t)) => unit =
+    "end";
+
+  let makePromiseExecutionContext =
+      (promiseExecutionContextJS: promiseExecutionContextJS)
+      : promiseExecutionContext => {
+    pass: () => _pass(promiseExecutionContextJS),
+    fail: () => _fail(promiseExecutionContextJS),
+    truthy: actual => _truthy(promiseExecutionContextJS, actual),
+    falsy: actual => _falsy(promiseExecutionContextJS, actual),
+    is: (expected, actual) => _is(promiseExecutionContextJS, actual, expected),
+    not: (expected, actual) => _not(promiseExecutionContextJS, actual, expected),
+    deepEqual: (expected, actual) => _deepEqual(promiseExecutionContextJS, actual, expected),
+    notDeepEqual: (expected, actual) => _notDeepEqual(promiseExecutionContextJS, actual, expected),
+    throws: thrower =>
+      _throws(promiseExecutionContextJS, thrower),
+    notThrows: nonThrower =>
+      _not_throws(promiseExecutionContextJS, nonThrower),
+    regex: (regex, content) => _regex(promiseExecutionContextJS, content, regex),
+    notRegex: (regex, content) => _notRegex(promiseExecutionContextJS, content, regex),
+  };
+  let makePromiseImplementationResultJS:
+    promiseImplementationResultJS('a) => promiseImplementationResult('a) =
+    result => result;
+  let makePromiseImplementation = (promiseImplementation, t) =>
+    t
+    |> makePromiseExecutionContext
+    |> promiseImplementation
+    |> makePromiseImplementationResultJS;
+
   [@bs.module "ava"]
   external _test :
     (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
