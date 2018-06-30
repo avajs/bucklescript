@@ -1,11 +1,10 @@
 open Ava.Promise.Serial;
 
-test("Promise.test", t =>
+test("Promise.Serial.test", t =>
   t.notThrows(Js.Promise.resolve())
 );
-exception Oh_no;
-test_failing("Promise.test_failing", t =>
-  t.notThrows(Js.Promise.reject(Oh_no))
+test_failing("Promise.Serial.test_failing", t =>
+  t.notThrows(Js.Promise.make((~resolve as _, ~reject as _) => Js.Exn.raiseError("Oh no")))
 );
 after(_ => Js.Promise.resolve());
 after_always(_ => Js.Promise.resolve());
@@ -13,4 +12,4 @@ after_each(_ => Js.Promise.resolve());
 after_each_always(_ => Js.Promise.resolve());
 before(_ => Js.Promise.resolve());
 before_each(_ => Js.Promise.resolve());
-todo("Promise.todo");
+todo("Promise.Serial.todo");
