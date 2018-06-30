@@ -3,6 +3,7 @@ type failAssertion = unit => unit;
 type truthyAssertion = bool => unit;
 type falsyAssertion = bool => unit;
 /* type deepEqualAssertion = 'a.('a, 'a) => unit; */
+type notThrowsAssertion('a) = Js.Promise.t('a) => Js.Promise.t(unit);
 
 type assertions = {
   pass: passAssertion,
@@ -13,15 +14,24 @@ type assertions = {
 };
 type cbAssertions = {
   pass: passAssertion,
-  /* fail: failAssertion,
-     truthy: truthyAssertion,
+  fail: failAssertion,
+  /* truthy: truthyAssertion,
      falsy: falsyAssertion,
      deepEqual: 'a .('a, 'a) => unit, */
   cb: (~error: Js.Exn.t=?, unit) => unit,
 };
+type promiseAssertions = {
+  pass: passAssertion,
+  fail: failAssertion,
+  /* truthy: truthyAssertion,
+     falsy: falsyAssertion,
+     deepEqual: 'a .('a, 'a) => unit, */
+  notThrows: 'a .notThrowsAssertion('a),
+};
 
 type executionContext = assertions;
 type cbExecutionContext = cbAssertions;
+type promiseExecutionContext = promiseAssertions;
 
 type executionContextJS;
 [@bs.send] external _pass : executionContextJS => unit = "pass";
@@ -35,6 +45,7 @@ let makeExecutionContext =
 };
 type cbExecutionContextJS;
 [@bs.send] external _cb_pass : cbExecutionContextJS => unit = "pass";
+[@bs.send] external _cb_fail : cbExecutionContextJS => unit = "fail";
 [@bs.send]
 external _cb_end : (cbExecutionContextJS, Js.Nullable.t(Js.Exn.t)) => unit =
   "end";
@@ -42,17 +53,44 @@ let makeCbExecutionContext =
     (cbExecutionContextJS: cbExecutionContextJS)
     : cbExecutionContext => {
   pass: () => _cb_pass(cbExecutionContextJS),
+  fail: () => _cb_fail(cbExecutionContextJS),
   cb: (~error: option(Js.Exn.t)=?, _) =>
     _cb_end(cbExecutionContextJS, Js.Nullable.fromOption(error)),
 };
+type promiseExecutionContextJS;
+[@bs.send] external _promise_pass : promiseExecutionContextJS => unit = "pass";
+[@bs.send] external _promise_fail : promiseExecutionContextJS => unit = "fail";
+[@bs.send]
+external _promise_not_throws :
+  (promiseExecutionContextJS, Js.Promise.t('a)) => Js.Promise.t(unit) =
+  "notThrows";
+[@bs.send]
+external _promise_end :
+  (promiseExecutionContextJS, Js.Nullable.t(Js.Exn.t)) => unit =
+  "end";
+let makePromiseExecutionContext =
+    (promiseExecutionContextJS: promiseExecutionContextJS)
+    : promiseExecutionContext => {
+  pass: () => _promise_pass(promiseExecutionContextJS),
+  fail: () => _promise_fail(promiseExecutionContextJS),
+  notThrows: nonThrower =>
+    _promise_not_throws(promiseExecutionContextJS, nonThrower),
+};
 
 type implementationResult = unit;
+type promiseImplementationResult('a) = Js.Promise.t('a);
 type implementationResultJS = unit;
+type promiseImplementationResultJS('a) = Js.Promise.t('a);
 let makeImplementationResultJS: implementationResultJS => implementationResult =
+  result => result;
+let makePromiseImplementationResultJS:
+  promiseImplementationResultJS('a) => promiseImplementationResult('a) =
   result => result;
 
 type implementation = executionContext => implementationResult;
 type cbImplementation = cbExecutionContext => implementationResult;
+type promiseImplementation('a) =
+  promiseExecutionContext => promiseImplementationResult('a);
 
 type implementationJS = executionContextJS => implementationResultJS;
 type cbImplementationJS = cbExecutionContextJS => implementationResultJS;
@@ -60,6 +98,11 @@ let makeImplementation = (implementation, t) =>
   t |> makeExecutionContext |> implementation |> makeImplementationResultJS;
 let makeCbImplementation = (cbImplementation, t) =>
   t |> makeCbExecutionContext |> cbImplementation |> makeImplementationResultJS;
+let makePromiseImplementation = (promiseImplementation, t) =>
+  t
+  |> makePromiseExecutionContext
+  |> promiseImplementation
+  |> makePromiseImplementationResultJS;
 
 type testInterface = (string, implementation) => unit;
 type todoDeclaration = string => unit;
@@ -77,6 +120,15 @@ type hookSkipInterface = implementation => unit;
 type cbFailingInterface = (string, cbImplementation) => unit;
 type cbOnlyInterface = (string, cbImplementation) => unit;
 type cbSkipInterface = (string, cbImplementation) => unit;
+type promiseInterface('a) = (string, promiseImplementation('a)) => unit;
+type alwaysPromiseInterface('a) = promiseImplementation('a) => unit;
+type hookPromiseInterface('a) = promiseImplementation('a) => unit;
+type hookPromiseSkipPromiseInterface('a) = promiseImplementation('a) => unit;
+type hookSkipPromiseInterface('a) = promiseImplementation('a) => unit;
+type failingPromiseInterface('a) =
+  (string, promiseImplementation('a)) => unit;
+type onlyPromiseInterface('a) = (string, promiseImplementation('a)) => unit;
+type skipPromiseInterface('a) = (string, promiseImplementation('a)) => unit;
 
 module Sync = {
   [@bs.module "ava"]
@@ -84,6 +136,13 @@ module Sync = {
   let test: testInterface =
     (message, implementation) =>
       _test(message, implementation |> makeImplementation);
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _test_failing : (string, executionContextJS => unit) => unit =
+    "failing";
+  let test_failing: failingInterface =
+    (message, implementation) =>
+      _test_failing(message, implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope "test"]
   external _test_only : (string, executionContextJS => unit) => unit = "only";
@@ -167,6 +226,13 @@ module Sync = {
         _test(message, implementation |> makeImplementation);
 
     [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _test_failing : (string, executionContextJS => unit) => unit =
+      "failing";
+    let test_failing: failingInterface =
+      (message, implementation) =>
+        _test_failing(message, implementation |> makeImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
     external _test_only : (string, executionContextJS => unit) => unit =
       "only";
     let test_only: onlyInterface =
@@ -244,6 +310,13 @@ module Async = {
   let test: cbInterface =
     (message, implementation) =>
       _test(message, implementation |> makeCbImplementation);
+
+  [@bs.module "ava"] [@bs.scope ("test", "cb")]
+  external _test_failing : (string, cbExecutionContextJS => unit) => unit =
+    "failing";
+  let test_failing: cbFailingInterface =
+    (message, implementation) =>
+      _test_failing(message, implementation |> makeCbImplementation);
 
   [@bs.module "ava"] [@bs.scope ("test", "cb")]
   external _test_only : (string, cbExecutionContextJS => unit) => unit =
@@ -326,6 +399,13 @@ module Async = {
       (message, implementation) =>
         _test(message, implementation |> makeCbImplementation);
 
+    [@bs.module "ava"] [@bs.scope ("test", "serial", "cb")]
+    external _test_failing : (string, cbExecutionContextJS => unit) => unit =
+      "failing";
+    let test_failing: cbFailingInterface =
+      (message, implementation) =>
+        _test_failing(message, implementation |> makeCbImplementation);
+
     /* [@bs.module "ava"] [@bs.scope ("test", "serial", "only")]
        external _test_only : (string, cbExecutionContextJS => unit) => unit =
          "cb";
@@ -393,6 +473,236 @@ module Async = {
     external _before_each : (cbExecutionContextJS => unit) => unit = "cb";
     let before_each: hookCbInterface =
       implementation => _before_each(implementation |> makeCbImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _todo : string => unit = "todo";
+    let todo: todoDeclaration = message => _todo(message);
+  };
+};
+
+module Promise = {
+  [@bs.module "ava"]
+  external _test :
+    (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "test";
+  let test: promiseInterface('a) =
+    (message, implementation) =>
+      _test(message, implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _test_failing :
+    (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "failing";
+  let test_failing: failingPromiseInterface('a) =
+    (message, implementation) =>
+      _test_failing(message, implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _test_only :
+    (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "only";
+  let test_only: onlyPromiseInterface('a) =
+    (message, implementation) =>
+      _test_only(message, implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope ("test", "failing")]
+  external _test_failing_only :
+    (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "only";
+  let test_failing_only: onlyPromiseInterface('a) =
+    (message, implementation) =>
+      _test_failing_only(
+        message,
+        implementation |> makePromiseImplementation,
+      );
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _test_skip :
+    (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "skip";
+  let test_skip: skipPromiseInterface('a) =
+    (message, implementation) =>
+      _test_skip(message, implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope ("test", "failing")]
+  external _test_failing_skip :
+    (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "skip";
+  let test_failing_skip: skipPromiseInterface('a) =
+    (message, implementation) =>
+      _test_failing_skip(
+        message,
+        implementation |> makePromiseImplementation,
+      );
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _after : (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "after";
+  let after: hookPromiseInterface('a) =
+    implementation => _after(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope ("test", "after")]
+  external _after_always :
+    (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "always";
+  let after_always: hookPromiseInterface('a) =
+    implementation =>
+      _after_always(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _after_each :
+    (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "afterEach";
+  let after_each: hookPromiseInterface('a) =
+    implementation => _after(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope ("test", "afterEach")]
+  external _after_each_always :
+    (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "always";
+  let after_each_always: hookPromiseInterface('a) =
+    implementation =>
+      _after_each_always(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _before : (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "before";
+  let before: hookPromiseInterface('a) =
+    implementation => _before(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope ("test", "before")]
+  external _before_always :
+    (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "always";
+  let before_always: hookPromiseInterface('a) =
+    implementation =>
+      _before_always(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _before_each :
+    (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "beforeEach";
+  let before_each: hookPromiseInterface('a) =
+    implementation =>
+      _before_each(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope ("test", "beforeEach")]
+  external _before_each_always :
+    (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+    "always";
+  let before_each_always: hookPromiseInterface('a) =
+    implementation =>
+      _before_each_always(implementation |> makePromiseImplementation);
+
+  [@bs.module "ava"] [@bs.scope "test"]
+  external _todo : string => unit = "todo";
+  let todo: todoDeclaration = message => _todo(message);
+
+  module Serial = {
+    [@bs.module "ava"] [@bs.scope "test"]
+    external _test :
+      (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "serial";
+    let test: promiseInterface('a) =
+      (message, implementation) =>
+        _test(message, implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope "test"]
+    external _test_failing :
+      (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "failing";
+    let test_failing: failingPromiseInterface('a) =
+      (message, implementation) =>
+        _test_failing(message, implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _test_only :
+      (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "only";
+    let test_only: onlyPromiseInterface('a) =
+      (message, implementation) =>
+        _test_only(message, implementation |> makePromiseImplementation);
+
+    /* [@bs.module "ava"] [@bs.scope ("test", "serial", "failing")]
+       external _test_failing_only :
+         (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+         "only";
+       let test_failing_only: onlyPromiseInterface('a) =
+         (message, implementation) =>
+           _test_failing_only(
+             message,
+             implementation |> makePromiseImplementation,
+           ); */
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _test_skip :
+      (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "skip";
+    let test_skip: skipPromiseInterface('a) =
+      (message, implementation) =>
+        _test_skip(message, implementation |> makePromiseImplementation);
+
+    /* [@bs.module "ava"] [@bs.scope ("test", "serial", "failing")]
+       external _test_failing_skip :
+         (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+         "skip";
+       let test_failing_skip: skipPromiseInterface('a) =
+         (message, implementation) =>
+           _test_failing_skip(
+             message,
+             implementation |> makePromiseImplementation,
+           ); */
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _after : (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "after";
+    let after: hookPromiseInterface('a) =
+      implementation => _after(implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial", "after")]
+    external _after_always :
+      (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "always";
+    let after_always: hookPromiseInterface('a) =
+      implementation =>
+        _after_always(implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _after_each :
+      (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "afterEach";
+    let after_each: hookPromiseInterface('a) =
+      implementation => _after(implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial", "afterEach")]
+    external _after_each_always :
+      (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "always";
+    let after_each_always: hookPromiseInterface('a) =
+      implementation =>
+        _after_each_always(implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _before : (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "before";
+    let before: hookPromiseInterface('a) =
+      implementation => _before(implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial", "before")]
+    external _before_always :
+      (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "always";
+    let before_always: hookPromiseInterface('a) =
+      implementation =>
+        _before_always(implementation |> makePromiseImplementation);
+
+    [@bs.module "ava"] [@bs.scope ("test", "serial")]
+    external _before_each :
+      (promiseExecutionContextJS => Js.Promise.t('a)) => unit =
+      "beforeEach";
+    let before_each: hookPromiseInterface('a) =
+      implementation =>
+        _before_each(implementation |> makePromiseImplementation);
 
     [@bs.module "ava"] [@bs.scope ("test", "serial")]
     external _todo : string => unit = "todo";

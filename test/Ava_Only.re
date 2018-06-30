@@ -15,3 +15,17 @@ Async.test_failing_only("Async.test_failing_only", t => {
      let error : Js.Exn.t = [%raw {| new Error("error out") |}];
      t.cb(~error, ());
    }); */
+
+exception Oh_no;
+Promise.test_only("Promise.test_only", t =>
+  t.notThrows(Js.Promise.resolve())
+);
+Promise.test_failing_only("Promise.test_failing_only", t =>
+  t.notThrows(Js.Promise.reject(Oh_no))
+);
+Promise.Serial.test_only("Promise.Serial.test_only", t =>
+  t.notThrows(Js.Promise.resolve())
+);
+/* Promise.Serial.test_failing_only("Promise.Serial.test_failing_only", t =>
+     t.notThrows(Js.Promise.reject(Oh_no))
+   ); */

@@ -15,3 +15,17 @@ Async.test_failing_skip("Async.test_failing_skip", t => {
      let error: Js.Exn.t = [%raw {| new Error("error out") |}];
      t.cb(~error, ());
    }); */
+
+exception Oh_no;
+Promise.test_skip("Promise.test_skip", t =>
+  t.notThrows(Js.Promise.resolve())
+);
+Promise.test_failing_skip("Promise.test_failing_skip", t =>
+  t.notThrows(Js.Promise.reject(Oh_no))
+);
+Promise.Serial.test_skip("Promise.Serial.test_skip", t =>
+  t.notThrows(Js.Promise.resolve())
+);
+/* Promise.Serial.test_failing_skip("Promise.Serial.test_failing_skip", t =>
+     t.notThrows(Js.Promise.reject(Oh_no))
+   ); */
