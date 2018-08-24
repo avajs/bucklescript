@@ -148,28 +148,28 @@ module Serial = {
     (message, implementation) =>
       _test_failing(message, implementation |> makeCbImplementation);
 
-  [@bs.module "ava"] [@bs.scope ("serial", "only")]
-  external _test_only: (string, cbExecutionContextJS => unit) => unit = "cb";
+  [@bs.module "ava"] [@bs.scope ("serial", "cb")]
+  external _test_only: (string, cbExecutionContextJS => unit) => unit = "only";
   let test_only: cbOnlyInterface =
     (message, implementation) =>
       _test_only(message, implementation |> makeCbImplementation);
 
-  [@bs.module "ava"] [@bs.scope ("serial", "failing", "only")]
+  [@bs.module "ava"] [@bs.scope ("serial", "cb", "failing")]
   external _test_failing_only: (string, cbExecutionContextJS => unit) => unit =
-    "cb";
+    "only";
   let test_failing_only: cbOnlyInterface =
     (message, implementation) =>
       _test_failing_only(message, implementation |> makeCbImplementation);
 
-  [@bs.module "ava"] [@bs.scope ("serial", "skip")]
-  external _test_skip: (string, cbExecutionContextJS => unit) => unit = "cb";
+  [@bs.module "ava"] [@bs.scope ("serial", "cb")]
+  external _test_skip: (string, cbExecutionContextJS => unit) => unit = "skip";
   let test_skip: cbSkipInterface =
     (message, implementation) =>
       _test_skip(message, implementation |> makeCbImplementation);
 
-  [@bs.module "ava"] [@bs.scope ("serial", "failing", "skip")]
+  [@bs.module "ava"] [@bs.scope ("serial", "cb", "failing")]
   external _test_failing_skip: (string, cbExecutionContextJS => unit) => unit =
-    "cb";
+    "skip";
   let test_failing_skip: cbSkipInterface =
     (message, implementation) =>
       _test_failing_skip(message, implementation |> makeCbImplementation);
