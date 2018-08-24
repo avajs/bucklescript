@@ -31,7 +31,7 @@ test("Should pass", t => {
 open Async;
 
 test("Should pass", t => {
-  Js.Global.setTimeout(() => t.cb(), 1000)
+  Js.Global.setTimeout(() => t.end_(), 1000)
   |> ignore
 });
 ```
