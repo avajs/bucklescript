@@ -51,7 +51,7 @@ type cbAssertions = {
   notThrows: notThrowsSyncAssertion,
   regex: regexAssertion,
   notRegex: notRegexAssertion,
-  cb: (~error: Js.Exn.t=?, unit) => unit,
+  end_: (~error: Js.Exn.t=?, unit) => unit,
 };
 type cbExecutionContext = cbAssertions;
 type cbExecutionContextJS;

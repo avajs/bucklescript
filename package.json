@@ -16,7 +16,10 @@
   },
   "homepage": "https://github.com/godu/bs-ava#readme",
   "files": [
-    "src/Ava.re",
+    "src/Internal.re",
+    "src/Sync.re",
+    "src/Async.re",
+    "src/Promise.re",
     "bsconfig.json"
   ],
   "keywords": [

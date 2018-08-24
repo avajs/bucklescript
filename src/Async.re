@@ -42,7 +42,7 @@ let makeCbExecutionContext =
     _notRegex(cbExecutionContextJS, content, regex),
   throws: task => _throws(cbExecutionContextJS, task),
   notThrows: task => _notThrows(cbExecutionContextJS, task),
-  cb: (~error: option(Js.Exn.t)=?, _) =>
+  end_: (~error: option(Js.Exn.t)=?, _) =>
     _cbEnd(cbExecutionContextJS, Js.Nullable.fromOption(error)),
 };
 let makeImplementationResultJS: implementationResultJS => implementationResult =

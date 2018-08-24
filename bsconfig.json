@@ -1,6 +1,6 @@
 {
-  "name": "bs-ava",
-  "version": "1.0.0",
+  "name": "@godu/bs-ava",
+  "version": "1.0.2",
   "namespace": true,
   "sources": [
     {
