@@ -1,4 +1,4 @@
-open Ava.Sync.Serial;
+open Sync.Serial;
 
 let hook = _ => ();
 

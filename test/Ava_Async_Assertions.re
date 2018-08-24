@@ -1,4 +1,4 @@
-open Ava.Async;
+open Async;
 
 test("Async.test#t.pass", t =>
   t.cb()
@@ -43,6 +43,18 @@ test("Async.test#t.notDeepEqual", t => {
   let actual = {name: "user0", age: 0};
   let expected = {name: "user1", age: 1};
   t.notDeepEqual(expected, actual);
+  t.cb();
+});
+
+test("Async.test#t.throws", t => {
+  t.throws(() => {
+    Js.Exn.raiseError("Oh no")
+  });
+  t.cb();
+});
+
+test("Async.test#t.notThrows", t => {
+  t.notThrows(() => ());
   t.cb();
 });
 

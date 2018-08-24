@@ -1,4 +1,4 @@
-open Ava.Async;
+open Async;
 
 test("Async.test", t =>
   t.cb()

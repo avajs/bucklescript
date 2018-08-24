@@ -1,4 +1,4 @@
-open Ava.Promise;
+open Promise;
 
 test("Promise.test#t.pass", t => {
   t.pass();
@@ -11,18 +11,15 @@ test_failing("Promise.test_failing#t.fail", t => {
   );
 });
 
- test("Promise.test#t.truthy", t =>
-  {
-    t.truthy(true);
-    Js.Promise.resolve();
-  }
-);
-test("Promise.test#t.falsy", t =>
-  {t.falsy(false);
+test("Promise.test#t.truthy", t => {
+  t.truthy(true);
+  Js.Promise.resolve();
+});
+test("Promise.test#t.falsy", t => {
+  t.falsy(false);
 
-    Js.Promise.resolve();
-  }
-);
+  Js.Promise.resolve();
+});
 
 type user = {
   name: string,
@@ -57,15 +54,25 @@ test("Promise.test#t.notDeepEqual", t => {
   Js.Promise.resolve();
 });
 
-test("Promise.test#t.throws", t => {
-  t.throws(Js.Promise.make((~resolve as _, ~reject as _) =>
-    Js.Exn.raiseError("Oh no")
-  ));
-});
+test("Promise.test#t.throws", t =>
+  t.throws(() => Js.Exn.raiseError("Oh no"))
+);
 
-test("Promise.test#t.notThrows", t => {
-  t.notThrows(Js.Promise.resolve());
-});
+test("Promise.test#t.notThrows", t =>
+  t.notThrows(() => ())
+);
+
+test("Promise.test#t.throwsAsync", t =>
+  t.throwsAsync(() =>
+    Js.Promise.make((~resolve as _, ~reject as _) =>
+      Js.Exn.raiseError("Oh no")
+    )
+  )
+);
+
+test("Promise.test#t.notThrowsAsync", t =>
+  t.notThrowsAsync(() => Js.Promise.resolve())
+);
 
 test("Promise.test#t.regex", t => {
   t.regex([%re "/^regex$/i"], "regex");

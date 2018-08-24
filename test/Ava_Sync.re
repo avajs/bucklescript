@@ -1,4 +1,4 @@
-open Ava.Sync;
+open Sync;
 
 let hook = _ => ();
 

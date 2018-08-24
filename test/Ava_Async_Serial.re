@@ -1,4 +1,4 @@
-open Ava.Async.Serial;
+open Async.Serial;
 
 test("Async.Serial.test", t =>
   t.cb()

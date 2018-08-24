@@ -19,7 +19,7 @@ Then add `@godu/bs-ava` to `bs-dev-dependencies` in your `bsconfig.json`:
 # Getting started
 
 ```ml
-open Ava.Sync;
+open Sync;
 
 test("Should pass", t => {
   t.deepEqual(1, 1);
@@ -28,7 +28,7 @@ test("Should pass", t => {
 ```
 
 ```ml
-open Ava.Async;
+open Async;
 
 test("Should pass", t => {
   Js.Global.setTimeout(() => t.cb(), 1000)
@@ -37,7 +37,7 @@ test("Should pass", t => {
 ```
 
 ```ml
-open Ava.Promise;
+open Promise;
 
 test("Should pass", t => {
   t.notThrows(Js.Promise.resolve("foo"));

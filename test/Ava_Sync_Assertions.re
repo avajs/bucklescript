@@ -1,4 +1,4 @@
-open Ava.Sync;
+open Sync;
 
 test("Sync.test#t.pass", t =>
   t.pass()
@@ -41,20 +41,18 @@ test("Sync.test#t.notDeepEqual", t => {
   t.notDeepEqual(expected, actual);
 });
 
-test("Sync.test#t.throws", t => {
-  t.throws(() => {
-    Js.Exn.raiseError("Oh no")
-  });
-});
+test("Sync.test#t.throws", t =>
+  t.throws(() => Js.Exn.raiseError("Oh no"))
+);
 
-test("Sync.test#t.notThrows", t => {
-  t.notThrows(() => ());
-});
+test("Sync.test#t.notThrows", t =>
+  t.notThrows(() => ())
+);
 
-test("Sync.test#t.regex", t => {
-  t.regex([%re "/^regex$/i"], "regex");
-});
+test("Sync.test#t.regex", t =>
+  t.regex([%re "/^regex$/i"], "regex")
+);
 
-test("Sync.test#t.notRegex", t => {
-  t.notRegex([%re "/^regex$/i"], "regexp");
-});
+test("Sync.test#t.notRegex", t =>
+  t.notRegex([%re "/^regex$/i"], "regexp")
+);
