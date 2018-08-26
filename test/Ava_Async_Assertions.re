@@ -4,11 +4,11 @@ test("Async.test#t.pass", t =>
   t.end_()
 );
 test_failing("Async.test_failing#t.fail", t => t.fail());
-test("Async.test#t.truthy", t =>{
+test("Async.test#t.truthy", t => {
   t.truthy(true);
   t.end_();
 });
-test("Async.test#t.falsy", t =>  {
+test("Async.test#t.falsy", t => {
   t.falsy(false);
   t.end_();
 });
@@ -47,9 +47,7 @@ test("Async.test#t.notDeepEqual", t => {
 });
 
 test("Async.test#t.throws", t => {
-  t.throws(() => {
-    Js.Exn.raiseError("Oh no")
-  });
+  t.throws(() => Js.Exn.raiseError("Oh no"));
   t.end_();
 });
 
