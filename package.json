@@ -5,6 +5,7 @@
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
     "clean": "bsb -clean-world",
+    "version": "node scripts/postversion.js && git add bsconfig.json",
     "test": "nyc ava",
     "ava": "ava"
   },
