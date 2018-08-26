@@ -1,4 +1,7 @@
 export default {
   "babel": false,
-  "compileEnhancements": false
+  "compileEnhancements": false,
+  "require": [
+    "esm"
+  ]
 };

@@ -43,8 +43,8 @@ let makeImplementationResultJS: implementationResultJS => implementationResult =
 let makeImplementation = (implementation, t) =>
   t |> makeExecutionContext |> implementation |> makeImplementationResultJS;
 
-[@bs.module]
-external _test: (string, executionContextJS => unit) => unit = "ava";
+[@bs.module "ava"]
+external _test: (string, executionContextJS => unit) => unit = "default";
 let test: testInterface =
   (message, implementation) =>
     _test(message, implementation |> makeImplementation);

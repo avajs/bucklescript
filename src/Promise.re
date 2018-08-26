@@ -72,10 +72,10 @@ let makePromiseImplementation = (promiseImplementation, t) =>
   |> promiseImplementation
   |> makePromiseImplementationResultJS;
 
-[@bs.module]
+[@bs.module "ava"]
 external _test:
   (string, promiseExecutionContextJS => Js.Promise.t('a)) => unit =
-  "ava";
+  "default";
 let test: promiseInterface('a) =
   (message, implementation) =>
     _test(message, implementation |> makePromiseImplementation);
