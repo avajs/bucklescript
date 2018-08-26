@@ -1,5 +1,7 @@
 # bs-ava
 
+[![Build Status](https://travis-ci.com/godu/bs-ava.svg?branch=master)](https://travis-ci.com/godu/bs-ava)
+
 **Experimental** [BuckleScript](https://github.com/bucklescript/bucklescript) bindings for [Ava](https://github.com/avajs/ava)
 
 # Installation

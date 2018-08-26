@@ -1,0 +1,20 @@
+language: node_js
+node_js:
+  - "10"
+  - "8"
+
+before_install:
+  - npm install -g reason-cli@latest-linux
+
+before_script:
+  - npm run build
+script: npm test
+
+compiler:
+- gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8

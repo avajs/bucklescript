@@ -1,3 +1,4 @@
 export default {
-  compileEnhancements: false,
+  "babel": false,
+  "compileEnhancements": false
 };
