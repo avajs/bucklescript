@@ -1,11 +1,3 @@
-const config = {
-  extensions: [
-    're'
-  ],
+export default {
   compileEnhancements: false,
-  require: [
-    '@godu/bs-register'
-  ]
 };
-
-export default config;
