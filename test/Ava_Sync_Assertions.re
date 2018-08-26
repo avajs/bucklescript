@@ -3,7 +3,7 @@ open Sync;
 test("Sync.test#t.pass", t =>
   t.pass()
 );
-test_failing("Sync.test_failing#t.fail", t => t.fail());
+testFailing("Sync.testFailing#t.fail", t => t.fail());
 
 test("Sync.test#t.truthy", t =>
   t.truthy(true)

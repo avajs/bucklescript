@@ -50,37 +50,34 @@ let test: testInterface =
     _test(message, implementation |> makeImplementation);
 
 [@bs.module "ava"]
-external _test_failing: (string, executionContextJS => unit) => unit =
+external _testFailing: (string, executionContextJS => unit) => unit =
   "failing";
-let test_failing: failingInterface =
+let testFailing: failingInterface =
   (message, implementation) =>
-    _test_failing(message, implementation |> makeImplementation);
+    _testFailing(message, implementation |> makeImplementation);
 
 [@bs.module "ava"]
-external _test_only: (string, executionContextJS => unit) => unit = "only";
-let test_only: onlyInterface =
+external _testOnly: (string, executionContextJS => unit) => unit = "only";
+let testOnly: onlyInterface =
   (message, implementation) =>
-    _test_only(message, implementation |> makeImplementation);
+    _testOnly(message, implementation |> makeImplementation);
 
 [@bs.module "ava"] [@bs.scope "failing"]
-external _test_failing_only: (string, executionContextJS => unit) => unit =
+external _testFailingOnly: (string, executionContextJS => unit) => unit =
   "only";
-let test_failing_only: onlyInterface =
+let testFailingOnly: onlyInterface =
   (message, implementation) =>
-    _test_failing_only(message, implementation |> makeImplementation);
+    _testFailingOnly(message, implementation |> makeImplementation);
 
 [@bs.module "ava"]
-external _test_skip: (string, executionContextJS => unit) => unit = "skip";
-let test_skip: skipInterface =
-  (message, implementation) =>
-    _test_skip(message, implementation |> makeImplementation);
+external _testSkip: (string, executionContextJS => unit) => unit = "skip";
+let testSkip: skipInterface = (message, _) => _testSkip(message, ignore);
 
 [@bs.module "ava"] [@bs.scope "failing"]
-external _test_failing_skip: (string, executionContextJS => unit) => unit =
+external _testFailingSkip: (string, executionContextJS => unit) => unit =
   "skip";
-let test_failing_skip: skipInterface =
-  (message, implementation) =>
-    _test_failing_skip(message, implementation |> makeImplementation);
+let testFailingSkip: skipInterface =
+  (message, _) => _testFailingSkip(message, ignore);
 
 [@bs.module "ava"]
 external _after: (executionContextJS => unit) => unit = "after";
@@ -88,39 +85,29 @@ let after: afterInterface =
   implementation => _after(implementation |> makeImplementation);
 
 [@bs.module "ava"] [@bs.scope "after"]
-external _after_always: (executionContextJS => unit) => unit = "always";
-let after_always: afterInterface =
-  implementation => _after_always(implementation |> makeImplementation);
+external _afterAlways: (executionContextJS => unit) => unit = "always";
+let afterAlways: afterInterface =
+  implementation => _afterAlways(implementation |> makeImplementation);
 
 [@bs.module "ava"]
-external _after_each: (executionContextJS => unit) => unit = "afterEach";
-let after_each: afterInterface =
+external _afterEach: (executionContextJS => unit) => unit = "afterEach";
+let afterEach: afterInterface =
   implementation => _after(implementation |> makeImplementation);
 
 [@bs.module "ava"] [@bs.scope "afterEach"]
-external _after_each_always: (executionContextJS => unit) => unit = "always";
-let after_each_always: afterInterface =
-  implementation => _after_each_always(implementation |> makeImplementation);
+external _afterEachAlways: (executionContextJS => unit) => unit = "always";
+let afterEachAlways: afterInterface =
+  implementation => _afterEachAlways(implementation |> makeImplementation);
 
 [@bs.module "ava"]
 external _before: (executionContextJS => unit) => unit = "before";
 let before: beforeInterface =
   implementation => _before(implementation |> makeImplementation);
 
-[@bs.module "ava"] [@bs.scope "before"]
-external _before_always: (executionContextJS => unit) => unit = "always";
-let before_always: beforeInterface =
-  implementation => _before_always(implementation |> makeImplementation);
-
 [@bs.module "ava"]
-external _before_each: (executionContextJS => unit) => unit = "beforeEach";
-let before_each: beforeInterface =
-  implementation => _before_each(implementation |> makeImplementation);
-
-[@bs.module "ava"] [@bs.scope "beforeEach"]
-external _before_each_always: (executionContextJS => unit) => unit = "always";
-let before_each_always: beforeInterface =
-  implementation => _before_each_always(implementation |> makeImplementation);
+external _beforeEach: (executionContextJS => unit) => unit = "beforeEach";
+let beforeEach: beforeInterface =
+  implementation => _beforeEach(implementation |> makeImplementation);
 
 [@bs.module "ava"] external _todo: string => unit = "todo";
 let todo: todoDeclaration = message => _todo(message);
@@ -133,37 +120,35 @@ module Serial = {
       _test(message, implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope "serial"]
-  external _test_failing: (string, executionContextJS => unit) => unit =
+  external _testFailing: (string, executionContextJS => unit) => unit =
     "failing";
-  let test_failing: failingInterface =
+  let testFailing: failingInterface =
     (message, implementation) =>
-      _test_failing(message, implementation |> makeImplementation);
+      _testFailing(message, implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope "serial"]
-  external _test_only: (string, executionContextJS => unit) => unit = "only";
-  let test_only: onlyInterface =
+  external _testOnly: (string, executionContextJS => unit) => unit = "only";
+  let testOnly: onlyInterface =
     (message, implementation) =>
-      _test_only(message, implementation |> makeImplementation);
+      _testOnly(message, implementation |> makeImplementation);
 
-  [@bs.module "ava"] [@bs.scope ("serial", "failing")]
-  external _test_failing_only: (string, executionContextJS => unit) => unit =
-    "only";
-  let test_failing_only: onlyInterface =
-    (message, implementation) =>
-      _test_failing_only(message, implementation |> makeImplementation);
+  /* [@bs.module "ava"] [@bs.scope ("serial", "failing")]
+     external _testFailingOnly : (string, executionContextJS => unit) => unit =
+       "only";
+     let testFailingOnly: onlyInterface =
+       (message, implementation) =>
+         _testFailingOnly(message, implementation |> makeImplementation); */
 
   [@bs.module "ava"] [@bs.scope "serial"]
-  external _test_skip: (string, executionContextJS => unit) => unit = "skip";
-  let test_skip: skipInterface =
-    (message, implementation) =>
-      _test_skip(message, implementation |> makeImplementation);
+  external _testSkip: (string, executionContextJS => unit) => unit = "skip";
+  let testSkip: skipInterface = (message, _) => _testSkip(message, ignore);
 
-  [@bs.module "ava"] [@bs.scope ("serial", "failing")]
-  external _test_failing_skip: (string, executionContextJS => unit) => unit =
-    "skip";
-  let test_failing_skip: skipInterface =
-    (message, implementation) =>
-      _test_failing_skip(message, implementation |> makeImplementation);
+  /* [@bs.module "ava"] [@bs.scope ("serial", "failing")]
+     external _testFailingSkip : (string, executionContextJS => unit) => unit =
+       "skip";
+     let testFailingSkip: skipInterface =
+       (message, _) =>
+         _testFailingSkip(message, ignore); */
 
   [@bs.module "ava"] [@bs.scope "serial"]
   external _after: (executionContextJS => unit) => unit = "after";
@@ -171,35 +156,29 @@ module Serial = {
     implementation => _after(implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope ("serial", "after")]
-  external _after_always: (executionContextJS => unit) => unit = "always";
-  let after_always: afterInterface =
-    implementation => _after_always(implementation |> makeImplementation);
+  external _afterAlways: (executionContextJS => unit) => unit = "always";
+  let afterAlways: afterInterface =
+    implementation => _afterAlways(implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope "serial"]
-  external _after_each: (executionContextJS => unit) => unit = "afterEach";
-  let after_each: afterInterface =
+  external _afterEach: (executionContextJS => unit) => unit = "afterEach";
+  let afterEach: afterInterface =
     implementation => _after(implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope ("serial", "afterEach")]
-  external _after_each_always: (executionContextJS => unit) => unit = "always";
-  let after_each_always: afterInterface =
-    implementation =>
-      _after_each_always(implementation |> makeImplementation);
+  external _afterEachAlways: (executionContextJS => unit) => unit = "always";
+  let afterEachAlways: afterInterface =
+    implementation => _afterEachAlways(implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope "serial"]
   external _before: (executionContextJS => unit) => unit = "before";
   let before: beforeInterface =
     implementation => _before(implementation |> makeImplementation);
 
-  [@bs.module "ava"] [@bs.scope ("serial", "before")]
-  external _before_always: (executionContextJS => unit) => unit = "always";
-  let before_always: beforeInterface =
-    implementation => _before_always(implementation |> makeImplementation);
-
   [@bs.module "ava"] [@bs.scope "serial"]
-  external _before_each: (executionContextJS => unit) => unit = "beforeEach";
-  let before_each: beforeInterface =
-    implementation => _before_each(implementation |> makeImplementation);
+  external _beforeEach: (executionContextJS => unit) => unit = "beforeEach";
+  let beforeEach: beforeInterface =
+    implementation => _beforeEach(implementation |> makeImplementation);
 
   [@bs.module "ava"] [@bs.scope "serial"]
   external _todo: string => unit = "todo";

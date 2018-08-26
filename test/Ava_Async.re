@@ -1,17 +1,17 @@
 open Async;
 
-test("Async.test", t =>
-  t.end_()
-);
-test_failing("Async.test_failing", t => {
+test("Async.test", t => {
+  t.pass();
+  t.end_();
+});
+testFailing("Async.testFailing", t => {
   let error: Js.Exn.t = [%raw {| new Error("Oh no") |}];
   t.end_(~error, ());
 });
-after(t => t.end_());
-after_always(t => t.end_());
-after_each(t => t.end_());
-after_each_always(t => t.end_());
 before(t => t.end_());
-
-before_each(t => t.end_());
+beforeEach(t => t.end_());
+after(t => t.end_());
+afterAlways(t => t.end_());
+afterEach(t => t.end_());
+afterEachAlways(t => t.end_());
 todo("Async.todo");

@@ -4,7 +4,7 @@ test("Promise.test#t.pass", t => {
   t.pass();
   Js.Promise.resolve();
 });
-test_failing("Promise.test_failing#t.fail", t => {
+testFailing("Promise.testFailing#t.fail", t => {
   t.pass();
   Js.Promise.make((~resolve as _, ~reject as _) =>
     Js.Exn.raiseError("Oh no")

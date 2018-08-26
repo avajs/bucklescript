@@ -1,33 +1,33 @@
-Sync.test_only("Sync.test_only", t => t.pass());
-Sync.test_failing_only("Sync.test_failing_only", t => t.fail());
-Sync.Serial.test_only("Sync.Serial.test_only", t => t.pass());
-/* Sync.Serial.test_failing_only("Sync.Serial.test_failing_only", t => t.fail()); */
+Sync.testOnly("Sync.testOnly", t => t.pass());
+Sync.testFailingOnly("Sync.testFailingOnly", t => t.fail());
+Sync.Serial.testOnly("Sync.Serial.testOnly", t => t.pass());
+/* Sync.Serial.testFailingOnly("Sync.Serial.testFailingOnly", t => t.fail()); */
 
-Async.test_only("Async.test_only", t => t.end_());
-Async.test_failing_only("Async.test_failing_only", t => {
+Async.testOnly("Async.testOnly", t => t.end_());
+Async.testFailingOnly("Async.testFailingOnly", t => {
   let error: Js.Exn.t = [%raw {| new Error("Oh no") |}];
   t.end_(~error, ());
 });
-Async.Serial.test_only("Async.Serial.test_only", t => t.end_());
-Async.Serial.test_failing_only("Async.Serial.test_failing_only", t => {
+Async.Serial.testOnly("Async.Serial.testOnly", t => t.end_());
+Async.Serial.testFailingOnly("Async.Serial.testFailingOnly", t => {
   let error: Js.Exn.t = [%raw {| new Error("Oh no") |}];
   t.end_(~error, ());
 });
 
-Promise.test_only("Promise.test_only", t =>
+Promise.testOnly("Promise.testOnly", t =>
   t.notThrowsAsync(() => Js.Promise.resolve())
 );
-Promise.test_failing_only("Promise.test_failing_only", t =>
+Promise.testFailingOnly("Promise.testFailingOnly", t =>
   t.notThrowsAsync(() =>
     Js.Promise.make((~resolve as _, ~reject as _) =>
       Js.Exn.raiseError("Oh no")
     )
   )
 );
-Promise.Serial.test_only("Promise.Serial.test_only", t =>
+Promise.Serial.testOnly("Promise.Serial.testOnly", t =>
   t.notThrowsAsync(() => Js.Promise.resolve())
 );
-/* Promise.Serial.test_failing_only("Promise.Serial.test_failing_only", t =>
+/* Promise.Serial.testFailingOnly("Promise.Serial.testFailingOnly", t =>
      t.notThrowsAsync(() =>
        Js.Promise.make((~resolve as _, ~reject as _) =>
          Js.Exn.raiseError("Oh no")

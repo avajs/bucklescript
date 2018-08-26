@@ -3,7 +3,7 @@ open Async;
 test("Async.test#t.pass", t =>
   t.end_()
 );
-test_failing("Async.test_failing#t.fail", t => t.fail());
+testFailing("Async.testFailing#t.fail", t => t.fail());
 test("Async.test#t.truthy", t => {
   t.truthy(true);
   t.end_();

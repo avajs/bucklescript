@@ -1,36 +1,36 @@
-Sync.test_skip("Sync.test_skip", t => t.pass());
-Sync.test_failing_skip("Sync.test_failing_skip", t => t.fail());
-Sync.Serial.test_skip("Sync.Serial.test_skip", t => t.pass());
-/* Sync.Serial.test_failing_skip("Sync.Serial.test_failing_skip", t => t.fail()); */
+Sync.testSkip("Sync.testSkip", t => t.pass());
+Sync.testFailingSkip("Sync.testFailingSkip", t => t.fail());
+Sync.Serial.testSkip("Sync.Serial.testSkip", t => t.pass());
+/* Sync.Serial.testFailingSkip("Sync.Serial.testFailingSkip", t => t.fail()); */
 
-Async.test_skip("Async.test_skip", t => t.pass());
-Async.test_failing_skip("Async.test_failing_skip", t => {
+Async.testSkip("Async.testSkip", t => t.pass());
+Async.testFailingSkip("Async.testFailingSkip", t => {
   let error: Js.Exn.t = [%raw {| new Error("Oh no") |}];
   t.end_(~error, ());
 });
-Async.Serial.test_skip("Async.Serial.test_skip", t => t.end_());
-Async.Serial.test_failing_skip("Async.Serial.test_failing_skip", t => {
+Async.Serial.testSkip("Async.Serial.testSkip", t => t.end_());
+Async.Serial.testFailingSkip("Async.Serial.testFailingSkip", t => {
   let error: Js.Exn.t = [%raw {| new Error("Oh no") |}];
   t.end_(~error, ());
 });
 
-Promise.test_skip("Promise.test_skip", t =>
+Promise.testSkip("Promise.testSkip", t =>
   t.notThrowsAsync(() => Js.Promise.resolve())
 );
-Promise.test_failing_skip("Promise.test_failing_skip", t =>
+Promise.testFailingSkip("Promise.testFailingSkip", t =>
   t.notThrowsAsync(() =>
     Js.Promise.make((~resolve as _, ~reject as _) =>
       Js.Exn.raiseError("Oh no")
     )
   )
 );
-Promise.Serial.test_skip("Promise.Serial.test_skip", t =>
+Promise.Serial.testSkip("Promise.Serial.testSkip", t =>
   t.notThrowsAsync(() => Js.Promise.resolve())
 );
-/* Promise.Serial.test_failing_skip("Promise.Serial.test_failing_skip", t =>
-     t.notThrowsAsync(() =>
-       Js.Promise.make((~resolve as _, ~reject as _) =>
-         Js.Exn.raiseError("Oh no")
-       )
-     )
-   ); */
+/* Promise.Serial.testFailingSkip("Promise.Serial.testFailingSkip", t =>
+  t.notThrowsAsync(() =>
+    Js.Promise.make((~resolve as _, ~reject as _) =>
+      Js.Exn.raiseError("Oh no")
+    )
+  )
+); */
