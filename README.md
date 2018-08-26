@@ -46,35 +46,6 @@ test("Should pass", t => {
 });
 ```
 
-# Usage with bs-register
-
-`bs-register` includes a require hook for `.re` files. This lets Ava run Reason files as tests.
-
-- Install `@godu/bs-register`
-```sh
-npm i -D @godu/bs-register
-```
-
-- Edit your `package.json`
-```json
-{
-  "scripts": {
-    ...
-    "test": "ava"
-  },
-  ...
-  "ava": {
-    "extensions": [
-      "re"
-    ],
-    "compileEnhancements": false,
-    "require": [
-      "@godu/bs-register"
-    ]
-  }
-}
-```
-
 # Coverage
 
 - Install `nyc`
@@ -91,7 +62,6 @@ npm i -D nyc
   },
   ...
   "nyc": {
-    "excludeAfterRemap": true,
     "reporter": [
       "lcov",
       "text-summary"
