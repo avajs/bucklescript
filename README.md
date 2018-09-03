@@ -1,20 +1,20 @@
 # bs-ava
 
-[![Build Status](https://travis-ci.com/godu/bs-ava.svg?branch=master)](https://travis-ci.com/godu/bs-ava)
+[![Build Status](https://travis-ci.com/ava/bucklescript.svg?branch=master)](https://travis-ci.com/ava/bucklescript)
 
 **Experimental** [BuckleScript](https://github.com/bucklescript/bucklescript) bindings for [Ava](https://github.com/avajs/ava)
 
 # Installation
 
 ```sh
-npm install --save-dev ava@next @godu/bs-ava
+npm install --save-dev ava@next @ava/bucklescript
 ```
 
-Then add `@godu/bs-ava` to `bs-dev-dependencies` in your `bsconfig.json`:
+Then add `@ava/bucklescript` to `bs-dev-dependencies` in your `bsconfig.json`:
 ```js
 {
   ...
-  "bs-dev-dependencies": ["@godu/bs-ava"]
+  "bs-dev-dependencies": ["@ava/bucklescript"]
 }
 ```
 

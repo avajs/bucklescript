@@ -1,6 +1,6 @@
 {
-  "name": "@godu/bs-ava",
-  "version": "3.0.0",
+  "name": "@ava/bucklescript",
+  "version": "0.0.0",
   "scripts": {
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
@@ -11,12 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/godu/bs-ava.git"
+    "url": "git+https://github.com/ava/bucklescript.git"
   },
   "bugs": {
-    "url": "https://github.com/godu/bs-ava/issues"
+    "url": "https://github.com/ava/bucklescript/issues"
   },
-  "homepage": "https://github.com/godu/bs-ava#readme",
+  "homepage": "https://github.com/ava/bucklescript#readme",
   "files": [
     "src/Internal.re",
     "src/Sync.re",
