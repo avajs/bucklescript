@@ -7,7 +7,7 @@
 # Installation
 
 ```sh
-npm install --save-dev @godu/bs-ava
+npm install --save-dev ava@next @godu/bs-ava
 ```
 
 Then add `@godu/bs-ava` to `bs-dev-dependencies` in your `bsconfig.json`:
