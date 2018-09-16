@@ -1,5 +1,5 @@
 {
-  "name": "@godu/bs-ava",
+  "name": "@ava/bucklescript",
   "version": "3.0.0",
   "namespace": true,
   "sources": [
